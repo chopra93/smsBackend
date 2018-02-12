@@ -45,6 +45,20 @@ public class SMSDaoImpl implements ISMSDao {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
+    public boolean isUniquePhone(String phone) {
+        Query query = sessionFactory.getCurrentSession().createQuery("SELECT u.id FROM Users u WHERE u.phone =:phone");
+        query.setParameter("phone", phone);
+        Object obj = query.uniqueResult();
+        if (obj == null)
+            return false;
+        else {
+            return true;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
     public boolean userSignUp(UserDTO user) {
         Users userData = new Users();
         userData.setName(user.getName());
@@ -53,6 +67,34 @@ public class SMSDaoImpl implements ISMSDao {
         userData.setPhone(user.getPhone());
         userData.setPwd(user.getPwd());
         sessionFactory.getCurrentSession().save(userData);
+
+        LoginDTO loginDTO = new LoginDTO();
+        loginDTO.setUsername(userData.getUsername());
+        loginDTO.setPwd(userData.getPwd());
+        long expiryTime = (new Date()).getTime() + 11352960000L;
+
+
+        Users users = userLogin(loginDTO);
+
+        Service service = new Service();
+        service.setServiceUsers(users);
+        service.setLimit("0");
+        service.setServiceType("SMS");
+        service.setExpiry(expiryTime);
+        service.setActive(true);
+
+
+        insertService(service);
+
+        Service service1 = new Service();
+        service1.setServiceUsers(users);
+        service1.setLimit("0");
+        service1.setServiceType("BULK");
+        service1.setExpiry(expiryTime);
+        service1.setActive(true);
+
+        insertService(service1);
+
         return true;
 
     }

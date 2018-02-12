@@ -47,11 +47,17 @@ public class SMSServiceImpl implements ISMSService {
     }
 
     @Override
+    public boolean isUniqueNumber(String number){
+        return smsDao.isUniquePhone(number);
+    }
+
+    @Override
     public boolean userSignUp(UserDTO users) {
         if ((users.getPwd()).equals(users.getPwdCompare()))
         {
             try {
                 return smsDao.userSignUp(users);
+
             }
             catch (Exception e ){
                 return false;
@@ -136,6 +142,41 @@ public class SMSServiceImpl implements ISMSService {
             }
         }
         return logoutResponse;
+    }
+
+    @Override
+    public ServiceResponse updateServiceAfterPayment(ServiceDTO serviceDTO, String number){
+
+        Users users = smsDao.fetchUserUsingUsername(number);
+        com.sms.core.entity.Service serviceEntity = new com.sms.core.entity.Service();
+        serviceEntity.setServiceUsers(users);
+        serviceEntity.setLimit(serviceDTO.getLimit());
+        serviceEntity.setServiceType(serviceDTO.getServiceType());
+        long expiryTime = (new Date()).getTime() + 11352960000L;
+        serviceEntity.setExpiry(expiryTime);
+        serviceEntity.setActive(true);
+
+        ServiceResponse serviceResponse = new ServiceResponse();
+        try {
+            Boolean serviceInsertionResponse = smsDao.insertService(serviceEntity);
+            if (serviceInsertionResponse){
+                serviceResponse.setMessage("Success");
+                serviceResponse.setStatusCode(200);
+                return serviceResponse;
+            }
+            else {
+                serviceResponse.setMessage("Failure");
+                serviceResponse.setStatusCode(500);
+                return serviceResponse;
+            }
+        }
+        catch (Exception e){
+            serviceResponse.setMessage("Exception");
+            serviceResponse.setStatusCode(500);
+            return serviceResponse;
+        }
+
+
     }
 
     @Override

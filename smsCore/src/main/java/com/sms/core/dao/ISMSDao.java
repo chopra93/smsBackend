@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface ISMSDao {
     boolean isUniqueUsername(String username);
+    boolean isUniquePhone(String phone);
     boolean userSignUp(UserDTO user);
     Users userLogin(LoginDTO loginDTO);
     Users fetchUserUsingUsername(String username);

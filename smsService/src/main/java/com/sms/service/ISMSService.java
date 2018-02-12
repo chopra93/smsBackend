@@ -10,6 +10,7 @@ import org.apache.commons.fileupload.FileItemStream;
 public interface ISMSService {
     boolean isUniqueUsername(String username);
     boolean userSignUp(UserDTO users);
+    boolean isUniqueNumber(String number);
 
     LoginResponse userLogin(LoginDTO loginDTO);
     LogoutResponse userLogout(String token);
@@ -17,4 +18,5 @@ public interface ISMSService {
     ServiceResponse createNewService(ServiceDTO serviceDTO);
     ServiceResponse fetchAllActiveServices(String token);
     boolean addMobileNumberAndMessage(String token, FileItemStream item, String message);
+    ServiceResponse updateServiceAfterPayment(ServiceDTO serviceDTO, String number);
 }

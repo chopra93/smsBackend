@@ -1,5 +1,6 @@
 package com.sms.api.controller;
 
+import com.sms.constant.SmsConstants;
 import com.sms.core.objects.*;
 import com.sms.service.ISMSService;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -30,9 +31,21 @@ public class SMSController {
 
     @RequestMapping(value = "/v1/user",method = RequestMethod.GET)
     public ResponseEntity testUsername(@RequestParam(value = "username", required = false) String username,
+                                       @RequestParam(value = "phone", required = false) String phone,
                                        @Context HttpServletRequest request){
-        boolean response = smsService.isUniqueUsername(username);
-        return ResponseEntity.ok(response);
+
+        if (username!=null){
+            boolean response = smsService.isUniqueUsername(username);
+            return ResponseEntity.ok(response);
+        }
+        else
+        if (phone!=null){
+            boolean response = smsService.isUniqueNumber(phone);
+            return ResponseEntity.ok(response);
+        }
+        else {
+            return ResponseEntity.ok(false);
+        }
     }
 
     @RequestMapping(value = "/v1/user/signUp",method = RequestMethod.POST)
@@ -66,6 +79,35 @@ public class SMSController {
         }
         else {
             return new ResponseEntity<>(logoutResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/v1/user/createServiceFromInstamojo",method = RequestMethod.POST)
+    public ResponseEntity userCreateService(@RequestBody InstamojoRequest instamojoRequest,
+                                            @Context HttpServletRequest request){
+        ServiceDTO serviceDTO = new ServiceDTO();
+        if (instamojoRequest.getOffer_slug().equalsIgnoreCase(SmsConstants.SMS_PACK_100_SMS)){
+            serviceDTO.setLimit(SmsConstants.LIMIT_100);
+        }
+        else
+        if (instamojoRequest.getOffer_slug().equalsIgnoreCase(SmsConstants.SMS_PACK_1000_SMS)){
+            serviceDTO.setLimit(SmsConstants.LIMIT_1000);
+        }
+        else
+        if (instamojoRequest.getOffer_slug().equalsIgnoreCase(SmsConstants.SMS_PACK_10000_SMS)){
+            serviceDTO.setLimit(SmsConstants.LIMIT_10000);
+        }
+        serviceDTO.setServiceType(SmsConstants.SMS_PLAN);
+        serviceDTO.setToken(SmsConstants.SMS_DEFAULT_TOKEN);
+
+        String number = (instamojoRequest.getBuyer_phone()).substring(3);
+
+        ServiceResponse serviceResponse = smsService.updateServiceAfterPayment(serviceDTO, number);
+        if (serviceResponse.getStatusCode() == 200) {
+            return ResponseEntity.ok(serviceResponse);
+        }
+        else {
+            return new ResponseEntity<>(serviceResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
