@@ -20,9 +20,27 @@ public class CircleStrategy implements IDrawStrategy {
         validate(input);
         if (first){
             circle = new Circle();
-
+            circle.setFillColor(fillColor);
+            circle.setStrokeColor(strokeColor);
+            circle.setCoordinateX(Integer.parseInt(input.split(" ")[1]));
+            circle.setCoordinateY(Integer.parseInt(input.split(" ")[2]));
+            first = !first;
+            isComplete.set(false);
+            return null;
         }
-        return null;
+        else {
+            first = !first;
+            circle.setRadius(getRadius(input));
+            isComplete.set(true);
+            return circle;
+        }
+    }
+
+    private int getRadius(String input){
+        int x = circle.getCoordinateX()-Integer.parseInt(input.split(" ")[1]);
+        int y = circle.getCoordinateY()-Integer.parseInt(input.split(" ")[2]);
+        int rad = (int) Math.sqrt(x*x+y*y);
+        return rad;
     }
 
     private boolean validate(String input){
