@@ -20,6 +20,7 @@ public class ServiceDTO {
     @NotNull
     private String limit;
     private Long expiry;
+    private String url;
 
     public Integer getId() {
         return id;
@@ -61,6 +62,14 @@ public class ServiceDTO {
         this.expiry = expiry;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "ServiceDTO{" +
@@ -69,6 +78,7 @@ public class ServiceDTO {
                 ", serviceType='" + serviceType + '\'' +
                 ", limit='" + limit + '\'' +
                 ", expiry=" + expiry +
+                ", url='" + url + '\'' +
                 '}';
     }
 }

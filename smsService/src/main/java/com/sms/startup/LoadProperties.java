@@ -1,6 +1,8 @@
 package com.sms.startup;
 
 import com.bettercloud.vault.VaultException;
+import com.sms.core.objects.PaymentDTO;
+import com.sms.service.IPaymentService;
 import com.sms.service.IRedisService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author chopra
@@ -19,6 +22,9 @@ public class LoadProperties {
 
   @Autowired
   private IRedisService redisService;
+
+  @Autowired
+  private IPaymentService paymentService;
 
   private static final Logger LOG = Logger.getLogger(LoadProperties.class);
 
@@ -37,6 +43,17 @@ public class LoadProperties {
     loadDocMProperties();
 
     loadUniqueDataCache();
+
+    loadPaymentUrl();
+  }
+
+  private void loadPaymentUrl(){
+    LOG.info("loading payment url");
+    List<PaymentDTO> paymentDTOList = paymentService.fetchPaymentList();
+    for(PaymentDTO paymentDTO: paymentDTOList){
+      redisService.setValue(paymentDTO.getType(),paymentDTO.getPaymentUrl());
+    }
+    LOG.info("loaded payment url");
   }
 
   private void loadUniqueDataCache() {

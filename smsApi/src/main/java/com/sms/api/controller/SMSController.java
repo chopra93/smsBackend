@@ -2,6 +2,7 @@ package com.sms.api.controller;
 
 import com.sms.constant.SmsConstants;
 import com.sms.core.objects.*;
+import com.sms.service.IPaymentService;
 import com.sms.service.ISMSService;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author chopra
@@ -28,6 +30,9 @@ public class SMSController {
 
     @Autowired
     private ISMSService smsService;
+
+    @Autowired
+    private IPaymentService paymentService;
 
     @RequestMapping(value = "/v1/user",method = RequestMethod.GET)
     public ResponseEntity testUsername(@RequestParam(value = "username", required = false) String username,
@@ -161,6 +166,14 @@ public class SMSController {
             e.printStackTrace();
         }
         return ResponseEntity.ok("");
+    }
+
+    @RequestMapping(value = "/v1/fetchPayment", method = RequestMethod.GET)
+    public ResponseEntity fetchAllPaymentOptions(@Context HttpServletRequest request){
+        List<PaymentDTO> paymentDTOList = paymentService.fetchPaymentList();
+        PaymentResponse response = new PaymentResponse();
+        response.setPayment(paymentDTOList);
+        return ResponseEntity.ok(response);
     }
 
 }

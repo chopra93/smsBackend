@@ -255,6 +255,21 @@ public class SMSServiceImpl implements ISMSService {
         }
         UserDTO userDetail = GSON.fromJson(valueJsonUsername, UserDTO.class);
         List<ServiceDTO> serviceDTOS = smsDao.fetchAllActiveService(userDetail.getUsername());
+
+//        for (ServiceDTO serviceDTO: serviceDTOS){
+//            if (serviceDTO.getServiceType().equalsIgnoreCase("SMS")){
+//                serviceDTO.setUrl(redisService.getValue("SMS"));
+//            }
+//            else
+//            if (serviceDTO.getServiceType().equalsIgnoreCase("OTP")){
+//                serviceDTO.setUrl(redisService.getValue("OTP"));
+//            }
+//            else
+//            if (serviceDTO.getServiceType().equalsIgnoreCase("BULK")){
+//                serviceDTO.setUrl(redisService.getValue("BULK"));
+//            }
+//        }
+
         if (serviceDTOS.isEmpty()){
             serviceResponse.setMessage("No Active Service");
             serviceResponse.setStatusCode(500);
